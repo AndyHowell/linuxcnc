@@ -1320,7 +1320,7 @@ static void get_pos_cmds(long period)
             } else {
                 joint->free_tp.max_acc = joint->acc_limit;
             }
-            simple_tp_update(&(joint->free_tp), servo_period );
+            jointjog_tp_update(&(joint->free_tp), servo_period );
             /* copy free TP output to pos_cmd and coarse_pos */
             joint->pos_cmd = joint->free_tp.curr_pos;
             joint->vel_cmd = joint->free_tp.curr_vel;
@@ -2449,7 +2449,7 @@ static int update_teleop_with_check(int axis_num,simple_tp_t *the_tp)
     emcmot_axis_t *axis = &axes[axis_num];
 
     save_curr_pos = the_tp->curr_pos;
-    simple_tp_update(the_tp, servo_period );
+    eoffset_tp_update(the_tp, servo_period );
 
     //workaround: axis letters not in [TRAJ]COORDINATES
     //            have min_pos_limit == max_pos_lim == 0
@@ -2485,7 +2485,7 @@ static int update_coord_with_bound(void)
         axis = &axes[axis_num];
         save_pos_cmd[axis_num]     = *pcmd_p[axis_num];
         save_offset_cmd[axis_num]  = axis->ext_offset_tp.pos_cmd;
-        simple_tp_update(&(axis->ext_offset_tp), servo_period );
+            axisjog_tp_update(&(axis->ext_offset_tp), servo_period );
     }
     apply_ext_offsets_to_carte_pos(+1); // add external offsets
 

@@ -669,6 +669,14 @@ Section.
   realtime part of the motion controller) to acknowledge receipt of
   messages from Task (the non-realtime part of the motion controller).
 
+* JOGMOD = alternate_jogging_module [jog_parms=value] used for the
+one-dimensional motions planned for jogging joints or axes and for
+external axis offset motion.
+The JOGMOD variable is optional.  If specified, use a specified (user-built)
+module instead of the default (jogmod).  Module parameters (jog_parms) may be
+included if supported by the named module.  The setting may be overridden
+from the command line using the -j option ($linuxcnc -h)
+
 * HOMEMOD = alternate_homing_module [home_parms=value]
 The HOMEMOD variable is optional.  If specified, use a specified (user-built)
 module instead of the default (homemod).  Module parameters (home_parms) may be

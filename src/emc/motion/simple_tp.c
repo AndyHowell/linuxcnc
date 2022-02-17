@@ -13,6 +13,16 @@
 #include "simple_tp.h"
 #include "rtapi_math.h"
 
+// No init required for default onedim planning.
+// Custom modules may allocate additional structs for local state data,
+// prior to calling simple_tp_init() and maintain as required.
+// Example: struct {...} extradata;
+//          tp->data = malloc(sizeof(extradata);
+void   simple_tp_init(simple_tp_t *tp) { return; }
+void  axisjog_tp_init(simple_tp_t *tp) { simple_tp_init(tp); return; }
+void jointjog_tp_init(simple_tp_t *tp) { simple_tp_init(tp); return; }
+void  eoffset_tp_init(simple_tp_t *tp) { simple_tp_init(tp); return; }
+
 void simple_tp_update(simple_tp_t *tp, double period)
 {
     double max_dv, tiny_dp, pos_err, vel_req;
@@ -72,4 +82,21 @@ void simple_tp_update(simple_tp_t *tp, double period)
     }
     /* integrate velocity to get new position */
     tp->curr_pos += tp->curr_vel * period;
+} // simple_tp_update()
+
+// default alternate planners just call simple_tp:
+void jointjog_tp_update(simple_tp_t *tp,double period) {
+    return simple_tp_update(tp,period);
 }
+void axisjog_tp_update(simple_tp_t *tp,double period) {
+    return simple_tp_update(tp,period);
+}
+void eoffset_tp_update(simple_tp_t *tp,double period) {
+    return simple_tp_update(tp,period);
+}
+
+EXPORT_SYMBOL(  simple_tp_init);
+EXPORT_SYMBOL(  simple_tp_update);
+EXPORT_SYMBOL(jointjog_tp_update);
+EXPORT_SYMBOL( axisjog_tp_update);
+EXPORT_SYMBOL( eoffset_tp_update);

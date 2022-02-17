@@ -30,10 +30,12 @@ extern "C" {
 	double pos_cmd;		/* position command */
 	double max_vel;		/* velocity limit */
 	double max_acc;		/* acceleration limit */
+	double max_jerk;		/* provisional jerk limit */
 	int enable;		/* if zero, motion stops ASAP */
 	double curr_pos;	/* current position */
 	double curr_vel;	/* current velocity */
 	int active;		/* non-zero if motion in progress */
+	void* data;	/* provision for custom module state data */
     } simple_tp_t;
 
 /* I could write a bunch of functions to read and write the first four
@@ -51,8 +53,15 @@ extern "C" {
    is enabled.  'period' is the period between calls, in seconds.
 */
 
-extern void simple_tp_update(simple_tp_t *tp, double period);
+void   simple_tp_init(simple_tp_t *tp);
+void jointjog_tp_init(simple_tp_t *tp);
+void  axisjog_tp_init(simple_tp_t *tp);
+void  eoffset_tp_init(simple_tp_t *tp);
 
+void   simple_tp_update(simple_tp_t *tp, double period);
+void jointjog_tp_update(simple_tp_t *tp, double period);
+void  axisjog_tp_update(simple_tp_t *tp, double period);
+void  eoffset_tp_update(simple_tp_t *tp, double period);
 
 #ifdef __cplusplus
 }

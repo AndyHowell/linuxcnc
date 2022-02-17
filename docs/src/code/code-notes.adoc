@@ -103,7 +103,11 @@ The realtime functions of the motion controller are implemented
 with modules -- shared objects for rtpreempt systems or kernel
 modules for some implementations (RTAI):
 
-* 'tpmod' - trajectory planning
+* 'jogmod' - one-dimensional planning for jogging (joint or axis)
+or external offset motion.
+
+* 'tpmod' - multi-dimensional trajectory planning in Cartesian
+coordinates
 
 * 'homemod' - homing functions
 
@@ -114,13 +118,13 @@ inverse (coordinates->joints) kinematics calculations
 
 LinuxCNC is started by a *linuxcnc* script which reads a
 configuration ini file and starts all needed processes.  For
-realtime motion control, the script first loads the default tpmod
-and homemod modules and then loads the kinematics and motion
+realtime motion control, the script first loads the default jogmod,
+tpmod, and homemod modules and then loads the kinematics and motion
 modules according to settings in halfiles specified by the ini
 file.
 
-Custom (user-built) homing or trajectory-planning modules can
-be used in place of the default modules via ini file settings
+Custom (user-built) jogging, homing, or trajectory-planning modules
+can be used in place of the default modules via ini file settings
 or command line options.  Custom modules must implement all
 functions used by the default modules.  The halcompile utility
 can be used to create a custom module.

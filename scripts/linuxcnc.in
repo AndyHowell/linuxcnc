@@ -113,12 +113,15 @@ Options:
     -d: Turn on "debug" mode
     -v: Turn on "verbose" mode
     -k: Continue in the presence of errors in .hal files
-    -t "tpmodulename [parameters]"
-            specify custom trajectory_planning_module
-            overrides optional ini setting [TRAJ]TPMOD
+    -j "jogmodulename [parameters]"
+            specify custom joggng_module
+            overrides optional ini setting [EMCMOT]JOGMOD
     -m "homemodulename [parameters]"
             specify custom homing_module
             overrides optional ini setting [EMCMOT]HOMEMOD
+    -t "tpmodulename [parameters]"
+            specify custom trajectory_planning_module
+            overrides optional ini setting [TRAJ]TPMOD
     -H "dirname": search dirname for Halfiles before searching
                   ini directory and system library:
                   $HALLIB_DIR
@@ -131,7 +134,7 @@ EOF
 ################################################################################
 # 1.1. strip and process command line options
 ################################################################################
-while getopts "dvlhkrH:t:m:" opt
+while getopts "dvlhkrH:j:m:t:" opt
 do
 	case "$opt" in
 	d)
@@ -165,15 +168,20 @@ do
             exit 1
         fi
         ;;
-    t)  # -t modname: user-supplied trajectory planning module
-        # modname must conform to tpmod api,
+    j)  # -j modname: user-supplied jogging module
+        # modname must conform to jogging api,
         # and be located in: $LINUXCNC_RTLIB_DIR
-        TPMOD=$OPTARG
+        JOGMOD=$OPTARG
         ;;
     m)  # -m modname: user-supplied homing module
         # modname must conform to homing api,
         # and be located in: $LINUXCNC_RTLIB_DIR
         HOMEMOD=$OPTARG
+        ;;
+    t)  # -t modname: user-supplied trajectory planning module
+        # modname must conform to tpmod api,
+        # and be located in: $LINUXCNC_RTLIB_DIR
+        TPMOD=$OPTARG
         ;;
 	*)
 		usage
@@ -516,17 +524,21 @@ RS274NGC_PARAMFILE=$retval
 GetFromIniEx MOT MOT EMCMOT EMCMOT motmod
 EMCMOT=$retval$MODULE_EXT # add module extension
 
-# commandline -t option supersedes inifile setting
-if [ -z "$TPMOD" ] ; then
-    GetFromIni TPMOD   TRAJ
-    TPMOD=${retval:-tpmod} #use default if not found
+# commandline -j option supersedes inifile setting
+if [ -z "$JOGMOD" ] ; then
+    GetFromIni JOGMOD EMCMOT
+    JOGMOD=${retval:-jogmod} #use default if not found
 fi
 # commandline -m option supersedes inifile setting
 if [ -z "$HOMEMOD" ] ; then
     GetFromIni HOMEMOD EMCMOT
     HOMEMOD=${retval:-homemod} #use default if not found
 fi
-
+# commandline -t option supersedes inifile setting
+if [ -z "$TPMOD" ] ; then
+    GetFromIni TPMOD   TRAJ
+    TPMOD=${retval:-tpmod} #use default if not found
+fi
 
 # 2.4. get io information
 GetFromIniEx IO IO EMCIO EMCIO io
@@ -842,9 +854,11 @@ fi
 
 # 4.3.6. execute HALCMD config files (if any)
 
-echo "$(basename $0) TPMOD=$TPMOD HOMEMOD=$HOMEMOD EMCMOT=${EMCMOT%.*}"
-eval $HALCMD loadrt "$TPMOD"
+echo "$(basename $0) JOGMOD=$JOGMOD TPMOD=$TPMOD HOMEMOD=$HOMEMOD EMCMOT=${EMCMOT%.*}"
+# Note order is important:
+eval $HALCMD loadrt "$JOGMOD"
 eval $HALCMD loadrt "$HOMEMOD"
+eval $HALCMD loadrt "$TPMOD"
 
 TWOPASS=`$INIVAR -ini "$INIFILE" -var TWOPASS -sec HAL -num 1 2> /dev/null`
 if [ -n "$TWOPASS" ] ; then

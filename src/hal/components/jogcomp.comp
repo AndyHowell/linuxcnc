@@ -1,0 +1,125 @@
+component jogcomp"jog module template";
+
+description """
+Example of a jog module buildable with halcompile.
+Demonstrates required code for #includes, function definitions, etc.
+
+See the source code file: src/emc/motion/simple_tp.c for the baseline
+implementation that includes all functions for the default \\fBjogmod\\fR
+module.
+
+To avoid updates that overwrite jogcomp.comp, best practice is
+to rename the file and its component name (example:
+\\fBuser_jogcomp.comp, user_jogcomp\\fR).
+
+The (renamed) component can be built and installed with
+halcompile and then substituted for the default jog module
+(\\fBjogmod\\fR) using:\n
+  $ linuxcnc \\fB-j user_jogcomp\\fR someconfig.ini\n
+or by inifile setting: \\fB[EMCMOT]HOMEMOD=user_jogcomp\\fR
+
+\\fBNote:\\fRIf using a deb install:\n
+1) halcompile is provided by the package linuxcnc-dev\n
+2) This source file for BRANCHNAME (master,2.9,etc) is downloadable from github:\n
+https://github.com/LinuxCNC/linuxcnc/blob/BRANCHNAME/src/hal/components/jogcomp.comp
+""";
+
+pin out bit is_module=1; //one pin is required to use halcompile)
+
+license "GPL";
+option  jogmod;
+option  extra_setup;
+;;
+
+//=====================================================================
+/* To use simple_tp planner files from a local git src tree:
+** set TOPDIR to the git src tree top directory
+** (Edit 'myname' as required)
+*/
+
+//#define TOPDIR /home/myname/linuxcnc-dev
+
+#ifdef TOPDIR  // {
+/* To use a modified file from the src tree substitute as reqd.
+** Example (comment out standard file, add new one):
+**         // #include USE_TOPDIR(src/emc/motion/simple_tp.c)
+**         #include "somepath/mymodified_simple_tp.c
+*/
+
+#define STR(s)        #s
+#define XSTR(s)       STR(s)
+#define USE_TOPDIR(b) XSTR(TOPDIR/b)
+
+#include USE_TOPDIR(src/emc/motion/simple_tp.c)
+//=====================================================================
+#else  // }{
+#warning !!!No TOPDIR defined, Nonfunctional jogging functions
+
+#include "simple_tp.h"
+
+void  simple_tp_update(simple_tp_t *tp,double period)
+{
+static bool gave_msg = 0;
+    if (gave_msg) {return;}
+    rtapi_print_msg(RTAPI_MSG_ERR
+         ,"!!! %s:\n!!! Inactive simple_tp\n!!! Homing/Jogging/Eoffsets NOT available\n",__FILE__);
+    gave_msg=1;
+    return;
+}
+
+void jointjog_tp_update(simple_tp_t *tp,double period)
+{
+    simple_tp_update(tp,period);
+    return;
+}
+
+void  axisjog_tp_update(simple_tp_t *tp,double period)
+{
+    simple_tp_update(tp,period);
+    return;
+}
+
+void  eoffset_tp_update(simple_tp_t *tp,double period)
+{
+    simple_tp_update(tp,period);
+    return;
+}
+
+// provision for initializations for modules
+void   simple_tp_init(simple_tp_t *tp) { return;}
+void jointjog_tp_init(simple_tp_t *tp) { simple_tp_init(tp); }
+void  axisjog_tp_init(simple_tp_t *tp) { simple_tp_init(tp); }
+void eoffset_tp_init(simple_tp_t *tp)  { simple_tp_init(tp); }
+
+EXPORT_SYMBOL(  simple_tp_init);
+EXPORT_SYMBOL(jointjog_tp_init);
+EXPORT_SYMBOL( axisjog_tp_init);
+EXPORT_SYMBOL( eoffset_tp_init);
+
+EXPORT_SYMBOL(  simple_tp_update);
+EXPORT_SYMBOL(jointjog_tp_update);
+EXPORT_SYMBOL( axisjog_tp_update);
+EXPORT_SYMBOL( eoffset_tp_update);
+#endif // }
+
+static char *jog_parms;
+RTAPI_MP_STRING(jog_parms,"Example jog parms");
+
+// rtapi_app_main() supplied by halcompile
+// EXTRA_SETUP is executed before rtapi_app_main()
+EXTRA_SETUP() {
+    if (!jog_parms) {jog_parms = "no_jog_parms";}
+    rtapi_print("@@@%s:%s: jog_parms=%s\n",__FILE__,__FUNCTION__,jog_parms);
+#ifndef TOPDIR
+    rtapi_print("\n!!!%s: NO jogging symbols provided\n\n",__FILE__);
+#else
+    rtapi_print("\n@@@%s: TOPDIR=%s\n",__FILE__,XSTR(TOPDIR));
+#endif
+
+    return 0;
+}
+
+#undef USE_TOPDIR
+#undef XSTR
+#undef STR
+#undef TOPDIR

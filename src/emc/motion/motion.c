@@ -229,6 +229,20 @@ int count_names(char *names[]){
 }
 
 static int module_intfc() {
+    int ano,jno;
+    emcmot_joint_t *joint;
+    emcmot_axis_t   *axis;
+
+    for (ano = 0; ano < EMCMOT_MAX_AXIS; ano++) {
+        axis = &axes[ano];
+        simple_tp_init(&axis->teleop_tp);
+        simple_tp_init(&axis->ext_offset_tp);
+    }
+    for (jno = 0; jno < ALL_JOINTS; jno++) {
+        joint = &joints[ano];
+        simple_tp_init(&joint->free_tp);
+    }
+
     homeMotFunctions(emcmotSetRotaryUnlock
                     ,emcmotGetRotaryIsUnlocked
                     );
@@ -245,6 +259,7 @@ static int module_intfc() {
     tpMotData(emcmotStatus
              ,emcmotConfig
              );
+
     return 0;
 }
 

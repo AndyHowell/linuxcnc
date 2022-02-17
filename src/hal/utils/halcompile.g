@@ -907,6 +907,8 @@ def document(filename, outfilename):
             print(rest, file=f)
         else:
             print(".HP", file=f)
+            if options.get("jogmod"):
+                print("Custom jog module loaded with \\fB[EMCMOT]JOGMOD=%s\\fR"%comp_name, file=f)
             if options.get("homemod"):
                 print("Custom Homing module loaded with \\fB[EMCMOT]HOMEMOD=%s\\fR"%comp_name, file=f)
             elif options.get("tpmod"):
@@ -1046,6 +1048,7 @@ def process(filename, mode, outfilename):
 
         f = open(outfilename, "w")
 
+        if options.get("jogmod"):  options["singleton"] = 1
         if options.get("homemod"): options["singleton"] = 1
         if options.get("tpmod"):   options["singleton"] = 1
 

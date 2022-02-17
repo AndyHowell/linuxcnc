@@ -1141,10 +1141,13 @@ motmod-objs := emc/kinematics/cubic.o
 motmod-objs += emc/motion/motion.o
 motmod-objs += emc/motion/command.o
 motmod-objs += emc/motion/control.o
-motmod-objs += emc/motion/simple_tp.o
 motmod-objs += emc/motion/emcmotutil.o
 motmod-objs += emc/motion/stashf.o
 motmod-objs += emc/motion/dbuf.o
+
+obj-m += jogmod.o
+jogmod-objs := emc/motion/jogmod.o
+jogmod-objs += emc/motion/simple_tp.o
 
 obj-m += homemod.o
 homemod-objs := emc/motion/homemod.o
@@ -1248,6 +1251,7 @@ endif
 ../rtlib/scope_rt$(MODULE_EXT): $(addprefix objects/rt,$(scope_rt-objs))
 ../rtlib/hal_lib$(MODULE_EXT): $(addprefix objects/rt,$(hal_lib-objs))
 ../rtlib/motmod$(MODULE_EXT): $(addprefix objects/rt,$(motmod-objs))
+../rtlib/jogmod$(MODULE_EXT): $(addprefix objects/rt,$(jogmod-objs))
 ../rtlib/tpmod$(MODULE_EXT): $(addprefix objects/rt,$(tpmod-objs))
 ../rtlib/homemod$(MODULE_EXT): $(addprefix objects/rt,$(homemod-objs))
 ../rtlib/trivkins$(MODULE_EXT): $(addprefix objects/rt,$(trivkins-objs))
