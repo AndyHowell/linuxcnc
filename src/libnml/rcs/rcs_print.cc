@@ -369,7 +369,7 @@ int rcs_fputs(const char *_str)
 	    break;
 	case RCS_PRINT_TO_FILE:
 	    if (NULL == rcs_print_file_stream) {
-		if (NULL == rcs_print_file_name) {
+		if (!*rcs_print_file_name) {
 		    return EOF;
 		}
 		rcs_print_file_stream = fopen(rcs_print_file_name, "a+");
