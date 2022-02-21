@@ -193,6 +193,10 @@ bool MetaButtonCodes::operator!=(const MetaButtonCodes& other) const
     return !(*this == other);
 }
 // ----------------------------------------------------------------------
+
+// Andy H: Can braces be removed without causing problems for old compilers?
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbraced-scalar-init"
 MetaButtonsCodes::MetaButtonsCodes(const ButtonsCode& buttons) :
     reset(buttons.reset, buttons.undefined),
     macro11(buttons.reset, buttons.function),
@@ -262,6 +266,8 @@ MetaButtonsCodes::MetaButtonsCodes(const ButtonsCode& buttons) :
     }
 {
 }
+#pragma GCC diagnostic pop
+
 // ----------------------------------------------------------------------
 const MetaButtonCodes& MetaButtonsCodes::find(const KeyCode& keyCode, const KeyCode& modifierCode) const
 {

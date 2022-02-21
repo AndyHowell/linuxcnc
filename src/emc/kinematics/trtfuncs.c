@@ -113,12 +113,15 @@ int trtKinematicsSetup(const int   comp_id,
     }
 
     rtapi_print("%s coordinates=%s assigns:\n", kp->kinsname,coordinates);
+    // Andy H.Indexing into axis string, not string-plus-int
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstring-plus-int"
     for (jno=0; jno<EMCMOT_MAX_JOINTS; jno++) {
         if (axis_idx_for_jno[jno] == -1) break; //fini
         rtapi_print("   Joint %d ==> Axis %c\n",
                    jno,*("XYZABCUVW"+axis_idx_for_jno[jno]));
     }
-
+#pragma GCC diagnostic pop
     haldata = hal_malloc(sizeof(struct haldata));
     if (!haldata) {goto error;}
 
